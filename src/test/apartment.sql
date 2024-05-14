@@ -1,0 +1,1 @@
+insert into flat (quantity_of_flat,price,district,address,area)values(3,100000, "Matveeska" ,"Dniprovskyi street",98);
