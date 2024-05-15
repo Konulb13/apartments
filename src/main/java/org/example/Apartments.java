@@ -3,7 +3,7 @@ package org.example;
 public class Apartments {
     private int id;
 private int quantity_of_flat;
-private int price;
+private float price;
 private String district;
 private String address;
 private int area;
@@ -11,7 +11,7 @@ private int area;
     public Apartments() {
     }
 
-    public Apartments(int id, int quantity_of_flat, String district, int price, String address, int area) {
+    public Apartments(int id, int quantity_of_flat, String district, float price, String address, int area) {
         this.id = id;
         this.quantity_of_flat = quantity_of_flat;
         this.district = district;
@@ -52,11 +52,11 @@ private int area;
         this.district = district;
     }
 
-    public int getPrice() {
+    public float getPrice() {
         return price;
     }
 
-    public void setPrice(int price) {
+    public void setPrice(float price) {
         this.price = price;
     }
 
