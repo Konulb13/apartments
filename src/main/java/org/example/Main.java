@@ -1,11 +1,82 @@
 package org.example;
+
 import java.sql.*;
+import java.util.Scanner;
+
 public class Main {
-    public static void main(String[] args) {
-        selectFlats();
+
+    public static void main(String[] args) throws SQLException {
+        Scanner sc = new Scanner(System.in);
+        while (true) {
+            System.out.println("if you want to create the table click 1 ");
+            System.out.println("if you want to add to the table click 2 ");
+            System.out.println("if you want to see the table click 3 ");
+
+            switch (sc.nextInt()) {
+
+                case 1:
+                    createTable();
+                    break;
+                case 2:
+                    add(sc);
+                    break;
+                case 3:
+                    selectFlats();
+                    break;
+            }
+        }
     }
+
+
+    static DBConnect db = new DBConnect();
+
+    private static void createTable() throws SQLException {
+        Statement st = db.getConnection().createStatement();
+        try {
+            st.execute("DROP TABLE IF EXISTS Apartments");
+            st.execute("CREATE TABLE flat (id INT NOT NULL " +
+                    "AUTO_INCREMENT PRIMARY KEY, " +
+                    "district VARCHAR(255) NOT NULL, " +
+                    "address VARCHAR(255) NOT NULL, " +
+                    "area INT NOT NULL, " +
+                    "quantity_of_flat INT NOT NULL, " +
+                    "price FLOAT NOT NULL)");
+        } finally {
+            st.close();
+        }
+    }
+
+    public static void add(Scanner sc) throws SQLException {
+        System.out.print("flat quantity_of_flat? ");
+        int quantityOfFlat = sc.nextInt();
+
+        System.out.print("flat apartment price? ");
+        float price = sc.nextFloat();
+
+        System.out.print("flat district? ");
+        String district = sc.nextLine();
+
+        System.out.print("flat address? ");
+        String address = sc.nextLine();
+
+        System.out.print("flat area? ");
+        int area = sc.nextInt();
+
+        PreparedStatement ps = db.getConnection().prepareStatement("INSERT INTO flat (quantity_of_flat,price,district,address,area) values (?,?,?,?,?)");
+        try {
+            ps.setInt(1, quantityOfFlat);
+            ps.setFloat(2, price);
+            ps.setString(3, district);
+            ps.setString(4, address);
+            ps.setInt(5, area);
+            ps.executeUpdate();
+        } finally {
+            ps.close();
+        }
+
+    }
+
     public static void selectFlats() {
-        DBConnect db = new DBConnect();
         String query = "select * from flat";
         try {
             Statement stmt = db.getConnection().createStatement();
@@ -21,7 +92,7 @@ public class Main {
                 System.out.println(apartments);
             }
         } catch (SQLException e) {
-          e.printStackTrace();
+            e.printStackTrace();
         }
     }
 
