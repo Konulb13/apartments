@@ -33,7 +33,7 @@ public class Main {
     private static void createTable() throws SQLException {
         Statement st = db.getConnection().createStatement();
         try {
-            st.execute("DROP TABLE IF EXISTS Apartments");
+            st.execute("DROP TABLE IF EXISTS flat");
             st.execute("CREATE TABLE flat (id INT NOT NULL " +
                     "AUTO_INCREMENT PRIMARY KEY, " +
                     "district VARCHAR(255) NOT NULL, " +
