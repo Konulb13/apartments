@@ -1,0 +1,342 @@
+Index: src/main/java/org/example/Main.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package org.example;\r\nimport java.sql.*;\r\npublic class Main {\r\n\r\n//    private static final String URL = \"jdbc:mysql://localhost:3306/apartments\";\r\n//    private static final String USER = \"root\";\r\n//    private static final String PASSWORD = \"3713k\";\r\n\r\n    public static void main(String[] args) {\r\n        selectFlats();\r\n    }\r\n    public static void selectFlats() {\r\n//        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD); PreparedStatement preparedStatement = connection.prepareStatement(\"select * from flat\"); ResultSet resultSet = preparedStatement.executeQuery();) {\r\n//            ResultSetMetaData rsmd = resultSet.getMetaData();\r\n//            while (resultSet.next()) {\r\n//                for (int i = 1; i <= rsmd.getColumnCount(); i++) {\r\n//                    System.out.print(resultSet.getString(i) + \"\\t\");\r\n//                }\r\n//                System.out.println();\r\n//            }\r\n//            resultSet.close();\r\n//            preparedStatement.close();\r\n//            if (!connection.isClosed()) {\r\n//                System.out.println(\"Connection is closed\");\r\n//            }\r\n//        } catch (SQLException e) {\r\n//            System.out.println(\"there was a problem connecting to the database\");\r\n//            e.printStackTrace();\r\n//        }\r\n        DBConnect db = new DBConnect();\r\n        String query = \"select * from flat\";\r\n        try {\r\n            Statement stmt = db.getConnection().createStatement();\r\n            ResultSet resultSet = stmt.executeQuery(query);\r\n            while (resultSet.next()) {\r\n                Apartments apartments = new Apartments();\r\n                apartments.setId(resultSet.getInt(1));\r\n                apartments.setQuantity_of_flat(resultSet.getInt(2));\r\n                apartments.setPrice(resultSet.getInt(3));\r\n                apartments.setDistrict(resultSet.getString(4));\r\n                apartments.setAddress(resultSet.getString(5));\r\n                apartments.setArea(resultSet.getInt(6));\r\n                System.out.println(apartments);\r\n            }\r\n        } catch (SQLException e) {\r\n          e.printStackTrace();\r\n        }\r\n    }\r\n\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/org/example/Main.java b/src/main/java/org/example/Main.java
+--- a/src/main/java/org/example/Main.java	
++++ b/src/main/java/org/example/Main.java	
+@@ -1,33 +1,85 @@
+ package org.example;
++
+ import java.sql.*;
++import java.util.Scanner;
++
+ public class Main {
+ 
+-//    private static final String URL = "jdbc:mysql://localhost:3306/apartments";
+-//    private static final String USER = "root";
+-//    private static final String PASSWORD = "3713k";
++    public static void main(String[] args) throws SQLException {
++        Scanner sc = new Scanner(System.in);
++        while (true) {
++            System.out.println("if you want to create the table click 1 ");
++            System.out.println("if you want to add to the table click 2 ");
++            System.out.println("if you want to see the table click 3 ");
+ 
+-    public static void main(String[] args) {
+-        selectFlats();
++            switch (sc.nextInt()) {
++
++                case 1:
++                    createTable();
++                    break;
++                case 2:
++                    add(sc);
++                    break;
++                case 3:
++                    selectFlats();
++                    break;
++            }
++        }
++    }
++
++
++    static DBConnect db = new DBConnect();
++
++    private static void createTable() throws SQLException {
++        Statement st = db.getConnection().createStatement();
++        try {
++            st.execute("DROP TABLE IF EXISTS flat");
++            st.execute("CREATE TABLE flat (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " +
++                    "district VARCHAR(255) NOT NULL, " +
++                    "address VARCHAR(255) NOT NULL, " +
++                    "area INT NOT NULL, " +
++                    "quantity_of_flat INT NOT NULL, " +
++                    "price FLOAT NOT NULL)");
++        } finally {
++            st.close();
++        }
+     }
++
++    public static void add(Scanner sc) throws SQLException {
++        System.out.print(" quantity_of_flat? ");
++        String q = sc.nextLine();
++        int quantityOfFlat = Integer.parseInt(q);
++
++        System.out.print("apartment price? ");
++        String apartmentPrice = sc.nextLine();
++        float price = Float.parseFloat(apartmentPrice);
++
++        System.out.print("flat district? ");
++        String district = sc.nextLine();
++        sc.nextLine();
++
++        System.out.print("flat address? ");
++        String address = sc.nextLine();
++
++        System.out.print("flat area? ");
++        String a = sc.nextLine();
++        int area = Integer.parseInt(a);
++
++        PreparedStatement ps = db.getConnection().prepareStatement("INSERT INTO flat (quantity_of_flat,price,district,address,area) values (?,?,?,?,?)");
++        try {
++            ps.setInt(1, quantityOfFlat);
++            ps.setFloat(2, price);
++            ps.setString(3, district);
++            ps.setString(4, address);
++            ps.setInt(5, area);
++            ps.executeUpdate();
++        } finally {
++            ps.close();
++        }
++
++    }
++
+     public static void selectFlats() {
+-//        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD); PreparedStatement preparedStatement = connection.prepareStatement("select * from flat"); ResultSet resultSet = preparedStatement.executeQuery();) {
+-//            ResultSetMetaData rsmd = resultSet.getMetaData();
+-//            while (resultSet.next()) {
+-//                for (int i = 1; i <= rsmd.getColumnCount(); i++) {
+-//                    System.out.print(resultSet.getString(i) + "\t");
+-//                }
+-//                System.out.println();
+-//            }
+-//            resultSet.close();
+-//            preparedStatement.close();
+-//            if (!connection.isClosed()) {
+-//                System.out.println("Connection is closed");
+-//            }
+-//        } catch (SQLException e) {
+-//            System.out.println("there was a problem connecting to the database");
+-//            e.printStackTrace();
+-//        }
+-        DBConnect db = new DBConnect();
+         String query = "select * from flat";
+         try {
+             Statement stmt = db.getConnection().createStatement();
+@@ -43,7 +95,7 @@
+                 System.out.println(apartments);
+             }
+         } catch (SQLException e) {
+-          e.printStackTrace();
++            e.printStackTrace();
+         }
+     }
+ 
+Index: src/main/java/org/example/DBConnect.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package org.example;\r\n\r\nimport java.sql.Connection;\r\nimport java.sql.DriverManager;\r\nimport java.sql.SQLException;\r\n\r\npublic class DBConnect {\r\n    private static final String URL = \"jdbc:mysql://localhost:3306/apartments\";\r\n    private static final String USER = \"root\";\r\n    private static final String PASSWORD = \"3713k\";\r\nprivate Connection connection;\r\n    public DBConnect(){\r\n        try {\r\n            connection = DriverManager.getConnection(URL,USER,PASSWORD);\r\n        } catch (SQLException e) {\r\n           e.printStackTrace();\r\n        }\r\n    }\r\n\r\n    public Connection getConnection() {\r\n        return connection;\r\n    }\r\n\r\n    public void setConnection(Connection connection) {\r\n        this.connection = connection;\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/org/example/DBConnect.java b/src/main/java/org/example/DBConnect.java
+--- a/src/main/java/org/example/DBConnect.java	
++++ b/src/main/java/org/example/DBConnect.java	
+@@ -2,6 +2,7 @@
+ 
+ import java.sql.Connection;
+ import java.sql.DriverManager;
++import java.sql.PreparedStatement;
+ import java.sql.SQLException;
+ 
+ public class DBConnect {
+@@ -24,4 +25,5 @@
+     public void setConnection(Connection connection) {
+         this.connection = connection;
+     }
++
+ }
+Index: src/main/java/org/example/Apartments.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package org.example;\r\n\r\npublic class Apartments {\r\n    private int id;\r\nprivate int quantity_of_flat;\r\nprivate int price;\r\nprivate String district;\r\nprivate String address;\r\nprivate int area;\r\n\r\n    public Apartments() {\r\n    }\r\n\r\n    public Apartments(int id, int quantity_of_flat, String district, int price, String address, int area) {\r\n        this.id = id;\r\n        this.quantity_of_flat = quantity_of_flat;\r\n        this.district = district;\r\n        this.price = price;\r\n        this.address = address;\r\n        this.area = area;\r\n    }\r\n\r\n    public int getId() {\r\n        return id;\r\n    }\r\n\r\n    public void setId(int id) {\r\n        this.id = id;\r\n    }\r\n\r\n    public int getArea() {\r\n        return area;\r\n    }\r\n\r\n    public void setArea(int area) {\r\n        this.area = area;\r\n    }\r\n\r\n    public String getAddress() {\r\n        return address;\r\n    }\r\n\r\n    public void setAddress(String address) {\r\n        this.address = address;\r\n    }\r\n\r\n    public String getDistrict() {\r\n        return district;\r\n    }\r\n\r\n    public void setDistrict(String district) {\r\n        this.district = district;\r\n    }\r\n\r\n    public int getPrice() {\r\n        return price;\r\n    }\r\n\r\n    public void setPrice(int price) {\r\n        this.price = price;\r\n    }\r\n\r\n    public int getQuantity_of_flat() {\r\n        return quantity_of_flat;\r\n    }\r\n\r\n    public void setQuantity_of_flat(int quantity_of_flat) {\r\n        this.quantity_of_flat = quantity_of_flat;\r\n    }\r\n\r\n    @Override\r\n    public String toString() {\r\n        return getClass().getSimpleName()+\"{id=\" + id + \", quantity_of_flat=\" + quantity_of_flat+ \"price=\" + price+\", district=\" + district + \", address=\" + address + \", area=\" + area + \"}\";\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/org/example/Apartments.java b/src/main/java/org/example/Apartments.java
+--- a/src/main/java/org/example/Apartments.java	
++++ b/src/main/java/org/example/Apartments.java	
+@@ -3,7 +3,7 @@
+ public class Apartments {
+     private int id;
+ private int quantity_of_flat;
+-private int price;
++private float price;
+ private String district;
+ private String address;
+ private int area;
+@@ -11,7 +11,7 @@
+     public Apartments() {
+     }
+ 
+-    public Apartments(int id, int quantity_of_flat, String district, int price, String address, int area) {
++    public Apartments(int id, int quantity_of_flat, String district, float price, String address, int area) {
+         this.id = id;
+         this.quantity_of_flat = quantity_of_flat;
+         this.district = district;
+@@ -52,11 +52,11 @@
+         this.district = district;
+     }
+ 
+-    public int getPrice() {
++    public float getPrice() {
+         return price;
+     }
+ 
+-    public void setPrice(int price) {
++    public void setPrice(float price) {
+         this.price = price;
+     }
+ 
+Index: src/test/apartment.sql
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>insert into flat (quantity_of_flat,price,district,address,area)values(3,100000, \"Matveeska\" ,\"Dniprovskyi street\",98);
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/apartment.sql b/src/test/apartment.sql
+--- a/src/test/apartment.sql	
++++ b/src/test/apartment.sql	
+@@ -1,1 +1,0 @@
+-insert into flat (quantity_of_flat,price,district,address,area)values(3,100000, "Matveeska" ,"Dniprovskyi street",98);
+\ No newline at end of file
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"AutoImportSettings\">\r\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\r\n  </component>\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"3d3ea00e-4339-4536-8239-9a97ef41f65e\" name=\"Changes\" comment=\"commit\">\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"FileTemplateManagerImpl\">\r\n    <option name=\"RECENT_TEMPLATES\">\r\n      <list>\r\n        <option value=\"Class\" />\r\n      </list>\r\n    </option>\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"ProjectColorInfo\">{\r\n  &quot;associatedIndex&quot;: 7\r\n}</component>\r\n  <component name=\"ProjectId\" id=\"2gI2byuUUOuzRj7AHwxpf6WcQyB\" />\r\n  <component name=\"ProjectLevelVcsManager\" settingsEditedManually=\"true\" />\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\"><![CDATA[{\r\n  \"keyToString\": {\r\n    \"Application.Main.executor\": \"Run\",\r\n    \"Downloaded.Files.Path.Enabled\": \"false\",\r\n    \"Repository.Attach.Annotations\": \"false\",\r\n    \"Repository.Attach.JavaDocs\": \"false\",\r\n    \"Repository.Attach.Sources\": \"false\",\r\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\r\n    \"SHARE_PROJECT_CONFIGURATION_FILES\": \"true\",\r\n    \"kotlin-language-version-configured\": \"true\",\r\n    \"last_opened_file_path\": \"C:/java_project/apartment\",\r\n    \"node.js.detected.package.eslint\": \"true\",\r\n    \"node.js.detected.package.tslint\": \"true\",\r\n    \"node.js.selected.package.eslint\": \"(autodetect)\",\r\n    \"node.js.selected.package.tslint\": \"(autodetect)\",\r\n    \"nodejs_package_manager_path\": \"npm\",\r\n    \"project.structure.last.edited\": \"Libraries\",\r\n    \"project.structure.proportion\": \"0.15\",\r\n    \"project.structure.side.proportion\": \"0.2\",\r\n    \"vue.rearranger.settings.migration\": \"true\"\r\n  },\r\n  \"keyToStringList\": {\r\n    \"DatabaseDriversLRU\": [\r\n      \"mysql_aurora_aws\"\r\n    ],\r\n    \"com.intellij.ide.scratch.LRUPopupBuilder$1/\": [\r\n      \"MySQL\"\r\n    ]\r\n  }\r\n}]]></component>\r\n  <component name=\"RunManager\" selected=\"Application.Main\">\r\n    <configuration name=\"Main\" type=\"Application\" factoryName=\"Application\" temporary=\"true\" nameIsGenerated=\"true\">\r\n      <option name=\"MAIN_CLASS_NAME\" value=\"org.example.Main\" />\r\n      <module name=\"apartment\" />\r\n      <extension name=\"coverage\">\r\n        <pattern>\r\n          <option name=\"PATTERN\" value=\"org.example.*\" />\r\n          <option name=\"ENABLED\" value=\"true\" />\r\n        </pattern>\r\n      </extension>\r\n      <method v=\"2\">\r\n        <option name=\"Make\" enabled=\"true\" />\r\n      </method>\r\n    </configuration>\r\n    <configuration name=\"apartment.sql\" type=\"DatabaseScript\" editBeforeRun=\"true\" nameIsGenerated=\"true\">\r\n      <script-file value=\"$PROJECT_DIR$/src/test/apartment.sql\" />\r\n      <script-mode>FILE</script-mode>\r\n      <method v=\"2\" />\r\n    </configuration>\r\n    <recent_temporary>\r\n      <list>\r\n        <item itemvalue=\"Application.Main\" />\r\n      </list>\r\n    </recent_temporary>\r\n  </component>\r\n  <component name=\"SharedIndexes\">\r\n    <attachedChunks>\r\n      <set>\r\n        <option value=\"bundled-jdk-9f38398b9061-18abd8497189-intellij.indexing.shared.core-IU-241.14494.240\" />\r\n        <option value=\"bundled-js-predefined-1d06a55b98c1-74d2a5396914-JavaScript-IU-241.14494.240\" />\r\n      </set>\r\n    </attachedChunks>\r\n  </component>\r\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"3d3ea00e-4339-4536-8239-9a97ef41f65e\" name=\"Changes\" comment=\"\" />\r\n      <created>1715370847695</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1715370847695</updated>\r\n      <workItem from=\"1715370848772\" duration=\"138000\" />\r\n      <workItem from=\"1715371076949\" duration=\"19934000\" />\r\n      <workItem from=\"1715720747163\" duration=\"706000\" />\r\n    </task>\r\n    <task id=\"LOCAL-00001\" summary=\"commit\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1715721039093</created>\r\n      <option name=\"number\" value=\"00001\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1715721039093</updated>\r\n    </task>\r\n    <option name=\"localTasksCounter\" value=\"2\" />\r\n    <servers />\r\n  </component>\r\n  <component name=\"TypeScriptGeneratedFilesManager\">\r\n    <option name=\"version\" value=\"3\" />\r\n  </component>\r\n  <component name=\"VcsManagerConfiguration\">\r\n    <MESSAGE value=\"commit\" />\r\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"commit\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	
++++ b/.idea/workspace.xml	
+@@ -6,6 +6,10 @@
+   <component name="ChangeListManager">
+     <list default="true" id="3d3ea00e-4339-4536-8239-9a97ef41f65e" name="Changes" comment="commit">
+       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/Apartments.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/Apartments.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/DBConnect.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/DBConnect.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/Main.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/test/apartment.sql" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/apartment.sql" afterDir="false" />
+     </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+@@ -20,6 +24,12 @@
+     </option>
+   </component>
+   <component name="Git.Settings">
++    <option name="PUSH_TAGS">
++      <GitPushTagMode>
++        <option name="argument" value="--tags" />
++        <option name="title" value="All" />
++      </GitPushTagMode>
++    </option>
+     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+   </component>
+   <component name="ProjectColorInfo">{
+@@ -31,36 +41,36 @@
+     <option name="hideEmptyMiddlePackages" value="true" />
+     <option name="showLibraryContents" value="true" />
+   </component>
+-  <component name="PropertiesComponent"><![CDATA[{
+-  "keyToString": {
+-    "Application.Main.executor": "Run",
+-    "Downloaded.Files.Path.Enabled": "false",
+-    "Repository.Attach.Annotations": "false",
+-    "Repository.Attach.JavaDocs": "false",
+-    "Repository.Attach.Sources": "false",
+-    "RunOnceActivity.ShowReadmeOnStart": "true",
+-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+-    "kotlin-language-version-configured": "true",
+-    "last_opened_file_path": "C:/java_project/apartment",
+-    "node.js.detected.package.eslint": "true",
+-    "node.js.detected.package.tslint": "true",
+-    "node.js.selected.package.eslint": "(autodetect)",
+-    "node.js.selected.package.tslint": "(autodetect)",
+-    "nodejs_package_manager_path": "npm",
+-    "project.structure.last.edited": "Libraries",
+-    "project.structure.proportion": "0.15",
+-    "project.structure.side.proportion": "0.2",
+-    "vue.rearranger.settings.migration": "true"
++  <component name="PropertiesComponent">{
++  &quot;keyToString&quot;: {
++    &quot;Application.Main.executor&quot;: &quot;Run&quot;,
++    &quot;Downloaded.Files.Path.Enabled&quot;: &quot;false&quot;,
++    &quot;Repository.Attach.Annotations&quot;: &quot;false&quot;,
++    &quot;Repository.Attach.JavaDocs&quot;: &quot;false&quot;,
++    &quot;Repository.Attach.Sources&quot;: &quot;false&quot;,
++    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
++    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
++    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
++    &quot;last_opened_file_path&quot;: &quot;C:/java_project/apartment&quot;,
++    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
++    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
++    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
++    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
++    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
++    &quot;project.structure.last.edited&quot;: &quot;Libraries&quot;,
++    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
++    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
++    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+   },
+-  "keyToStringList": {
+-    "DatabaseDriversLRU": [
+-      "mysql_aurora_aws"
++  &quot;keyToStringList&quot;: {
++    &quot;DatabaseDriversLRU&quot;: [
++      &quot;mysql_aurora_aws&quot;
+     ],
+-    "com.intellij.ide.scratch.LRUPopupBuilder$1/": [
+-      "MySQL"
++    &quot;com.intellij.ide.scratch.LRUPopupBuilder$1/&quot;: [
++      &quot;MySQL&quot;
+     ]
+   }
+-}]]></component>
++}</component>
+   <component name="RunManager" selected="Application.Main">
+     <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+       <option name="MAIN_CLASS_NAME" value="org.example.Main" />
+@@ -104,7 +114,11 @@
+       <updated>1715370847695</updated>
+       <workItem from="1715370848772" duration="138000" />
+       <workItem from="1715371076949" duration="19934000" />
+-      <workItem from="1715720747163" duration="706000" />
++      <workItem from="1715720747163" duration="3391000" />
++      <workItem from="1715805404419" duration="2832000" />
++      <workItem from="1716331452624" duration="13000" />
++      <workItem from="1716844786951" duration="714000" />
++      <workItem from="1716926270575" duration="4113000" />
+     </task>
+     <task id="LOCAL-00001" summary="commit">
+       <option name="closed" value="true" />
+@@ -114,7 +128,23 @@
+       <option name="project" value="LOCAL" />
+       <updated>1715721039093</updated>
+     </task>
+-    <option name="localTasksCounter" value="2" />
++    <task id="LOCAL-00002" summary="commit">
++      <option name="closed" value="true" />
++      <created>1715721469564</created>
++      <option name="number" value="00002" />
++      <option name="presentableId" value="LOCAL-00002" />
++      <option name="project" value="LOCAL" />
++      <updated>1715721469564</updated>
++    </task>
++    <task id="LOCAL-00003" summary="commit">
++      <option name="closed" value="true" />
++      <created>1715721602191</created>
++      <option name="number" value="00003" />
++      <option name="presentableId" value="LOCAL-00003" />
++      <option name="project" value="LOCAL" />
++      <updated>1715721602191</updated>
++    </task>
++    <option name="localTasksCounter" value="4" />
+     <servers />
+   </component>
+   <component name="TypeScriptGeneratedFilesManager">
