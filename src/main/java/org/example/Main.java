@@ -27,15 +27,13 @@ public class Main {
         }
     }
 
-
     static DBConnect db = new DBConnect();
 
     private static void createTable() throws SQLException {
         Statement st = db.getConnection().createStatement();
         try {
             st.execute("DROP TABLE IF EXISTS flat");
-            st.execute("CREATE TABLE flat (id INT NOT NULL " +
-                    "AUTO_INCREMENT PRIMARY KEY, " +
+            st.execute("CREATE TABLE flat (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " +
                     "district VARCHAR(255) NOT NULL, " +
                     "address VARCHAR(255) NOT NULL, " +
                     "area INT NOT NULL, " +
@@ -48,10 +46,12 @@ public class Main {
 
     public static void add(Scanner sc) throws SQLException {
         System.out.print("flat quantity_of_flat? ");
-        int quantityOfFlat = sc.nextInt();
+        String q = sc.next();
+        int quantityOfFlat = Integer.parseInt(q);
 
         System.out.print("flat apartment price? ");
-        float price = sc.nextFloat();
+        String apartmentPrice = sc.next();
+        float price = Float.parseFloat(apartmentPrice);
 
         System.out.print("flat district? ");
         String district = sc.nextLine();
@@ -60,7 +60,8 @@ public class Main {
         String address = sc.nextLine();
 
         System.out.print("flat area? ");
-        int area = sc.nextInt();
+        String a = sc.nextLine();
+        int area = Integer.parseInt(a);
 
         PreparedStatement ps = db.getConnection().prepareStatement("INSERT INTO flat (quantity_of_flat,price,district,address,area) values (?,?,?,?,?)");
         try {
@@ -73,7 +74,6 @@ public class Main {
         } finally {
             ps.close();
         }
-
     }
 
     public static void selectFlats() {
@@ -95,5 +95,4 @@ public class Main {
             e.printStackTrace();
         }
     }
-
 }
