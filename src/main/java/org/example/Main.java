@@ -1,5 +1,4 @@
 package org.example;
-
 import java.sql.*;
 import java.util.Scanner;
 
@@ -7,10 +6,12 @@ public class Main {
 
     public static void main(String[] args) throws SQLException {
         Scanner sc = new Scanner(System.in);
+
         while (true) {
             System.out.println("if you want to create the table click 1 ");
             System.out.println("if you want to add to the table click 2 ");
             System.out.println("if you want to see the table click 3 ");
+            System.out.println("if you want to delete the table click 4 ");
 
             switch (sc.nextInt()) {
 
@@ -23,11 +24,15 @@ public class Main {
                 case 3:
                     selectFlats();
                     break;
+                case 4:
+                    deleteFlats(sc);
+                    break;
             }
         }
     }
 
     static DBConnect db = new DBConnect();
+
 
     private static void createTable() throws SQLException {
         Statement st = db.getConnection().createStatement();
@@ -54,13 +59,13 @@ public class Main {
         float price = Float.parseFloat(apartmentPrice);
 
         System.out.print("flat district? ");
-        String district = sc.nextLine();
+        String district = sc.next();
 
         System.out.print("flat address? ");
-        String address = sc.nextLine();
+        String address = sc.next();
 
         System.out.print("flat area? ");
-        String a = sc.nextLine();
+        String a = sc.next();
         int area = Integer.parseInt(a);
 
         PreparedStatement ps = db.getConnection().prepareStatement("INSERT INTO flat (quantity_of_flat,price,district,address,area) values (?,?,?,?,?)");
@@ -74,6 +79,7 @@ public class Main {
         } finally {
             ps.close();
         }
+
     }
 
     public static void selectFlats() {
@@ -95,4 +101,18 @@ public class Main {
             e.printStackTrace();
         }
     }
+
+    private static void deleteFlats(Scanner sc) throws SQLException {
+        System.out.print("Enter flat ID ");
+        String id = sc.next();
+
+        PreparedStatement ps = db.getConnection().prepareStatement("DELETE FROM flat WHERE id = ?");
+        try {
+            ps.setInt(1, Integer.parseInt(id));
+            ps.executeUpdate();
+        } finally {
+            ps.close();
+        }
+    }
+
 }
